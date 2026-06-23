@@ -14,7 +14,7 @@ struct Territorio {
 
 typedef struct Territorio Territorio;
 
-void atacar(Territorio *atacante, Territorio *defensor) {
+void atacar(Territorio *atacante, Territorio *defensor, int *territoriosConquistados) {
     int dadoAtacante = (rand() % 6) + 1;
     int dadoDefensor = (rand() % 6) + 1;
 
@@ -31,6 +31,7 @@ void atacar(Territorio *atacante, Territorio *defensor) {
             defensor->tropas = 0;
             strcpy(defensor->cor, atacante->cor);
             printf("O territorio %s foi conquistado!\n", defensor->nome);
+            (*territoriosConquistados)++;
         }
 
     } else {
@@ -50,7 +51,7 @@ void exibirTerritorios(Territorio *territorios, int quantidade) {
     printf("\n===== MAPA DO MUNDO - ESTADO ATUAL =====\n");
 
     for (int i = 0; i < quantidade; i++) {
-        printf("%d. %s Exercito - %s, Tropas: %d\n",
+        printf("%d. %s: Exercito - %s, Tropas: %d\n",
             i + 1,
             territorios[i].nome,
             territorios[i].cor,
@@ -94,12 +95,33 @@ void exibirMissao(int missao) {
     }
 }
 
+int verificarMissao(Territorio *territorios, int quantidade, int missao, int territoriosConquistados) {
+    if (missao == 0) {
+        for (int i = 0; i < quantidade; i++) {
+            if (strcmp(territorios[i].cor, "Verde") == 0) {
+                return 0;
+            }
+        }
+
+        return 1;
+    }
+
+    if (missao == 1) {
+        if (territoriosConquistados >= 3) {
+            return 1;
+        }
+        return 0;
+    }
+
+    return 0;
+}
+
 void exibirMenu() {
-    printf("\n===== MENU =====\n");
+    printf("\n========== MENU ==========\n");
     printf("1 - Atacar\n");
-    printf("2 - Verficar Missao\n");
-    printf("0 - sair\n");
-    printf("Escolha uma opcao: \n");
+    printf("2 - Verificar Missao\n");
+    printf("0 - Sair\n");
+    printf("Escolha uma opcao: ");
 }
 
 // --- Função para Limpar o buffer de entrada ---
@@ -127,48 +149,89 @@ int main() {
 
     int missao = sorteMissao();
 
+    printf("\n===== INICIANDO JOGO WAR =====\n");
+
     exibirMissao(missao);
     
     int atacante;
     int defensor;
 
+    int opcao;
+
+    int territoriosConquistados = 0;
+
     do {
         exibirTerritorios(territorios, quantidade);
-
-        printf("\nEscolha o territorio atacante (1 a %d) ou 0 para sair: ", quantidade);
-        scanf("%d", &atacante);
-
-        if (atacante == 0) {
-            printf("\nEncerrando o jogo...\n");
-            break;
-        }
-
-        printf("Escolha o territorio defensor (1 a %d): ", quantidade);
-        scanf("%d", &defensor);
-
+        exibirMenu();
+        scanf("%d", &opcao);
         limparbufferEntrada();
 
-        atacante--;
-        defensor--;
+        switch (opcao) {
+            case 1:
+                printf("\nOpcao atacar escolhida.\n");
 
-        if (atacante < 0 || atacante >= quantidade || defensor < 0 || defensor >= quantidade) {
-            printf("\nEscolha invalida de territorio. Tente novamente.\n");
-            continue;
+                printf("\n========================================\n");
+                printf("\nEscolha o territorio atacante (1 a %d) ou 0 para sair: ", quantidade);
+                scanf("%d", &atacante);
+
+                if (atacante == 0) {
+                    printf("\nEncerrando o jogo...\n");
+                    break;
+                }
+
+                printf("Escolha o territorio defensor (1 a %d): ", quantidade);
+                scanf("%d", &defensor);
+
+                limparbufferEntrada();
+
+                atacante--;
+                defensor--;
+
+                if (atacante < 0 || atacante >= quantidade || defensor < 0 || defensor >= quantidade) {
+                    printf("\nEscolha invalida de territorio. Tente novamente.\n");
+                    continue;
+                }
+
+                if (atacante == defensor) {
+                    printf("\nO atacante e o defensor nao podem ser o mesmo territorio. Tente novamente.\n");
+                    continue;
+                }
+
+                if (territorios[atacante].tropas <= 0) {
+                    printf("\nTerritorios com 0 tropas nao pode atacar.\n");
+                    continue;
+                }
+
+                atacar(
+                    &territorios[atacante], 
+                    &territorios[defensor],
+                    &territoriosConquistados
+                );
+
+                break;
+
+            case 2:
+                exibirMissao(missao);
+
+                if (verificarMissao(territorios, quantidade, missao, territoriosConquistados)) {
+                    printf("\nParabens! Voce completou sua missao!\n");
+                } else {
+                    printf("\nMissao ainda nao concluida.\n");
+                }
+                break;
+
+            case 0:
+                printf("\nSaindo do jogo...");
+                break;
+
+            default: 
+                printf("Opcao invalida. tente novamente.\n");
+                break;        
         }
 
-        if (atacante == defensor) {
-            printf("\nO atacante e o defensor nao podem ser o mesmo territorio. Tente novamente.\n");
-            continue;
-        }
+        
 
-        if (territorios[atacante].tropas <= 0 || territorios[defensor].tropas <= 0) {
-            printf("\nTerritorios com 0 tropas nao podem atacar ou defender.\n");
-            continue;
-        }
-
-        atacar(&territorios[atacante], &territorios[defensor]);
-
-    } while (1); 
+    } while (opcao != 0); 
 
     // Exibição dos territórios cadastrados
     exibirTerritorios(territorios, quantidade);
