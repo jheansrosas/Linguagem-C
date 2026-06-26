@@ -4,6 +4,7 @@
 #define TAM_MAX 10
 #define TAM_STRING 50
 
+// EStrutura que representa um item da mochila
 typedef struct {
     char nome[TAM_STRING];
     char tipo[TAM_STRING];
@@ -13,10 +14,12 @@ typedef struct {
 void adicionarItem(Item mochila[], int *totalItens);
 void removerItem(Item mochila[], int *totalItens);
 void listarItens(Item mochila[], int totalItens);
-void exibirMenu();
+void exibirMenu(int totalItens);
 
 int main() {
+    // Vetor estático que armazena os itens da mochila
     Item mochila[TAM_MAX];
+    
     int totalItens = 0;
     int opcao;
 
@@ -50,6 +53,7 @@ int main() {
     return 0;
 }
 
+// Exibe o menu principal e a quantidade atual de intens na mochila
 void exibirMenu(int totalItens) {
     printf("\n=====================================\n");
     printf(" MOCHILA DE SOBREVIVENCIA - ILHA\n");
@@ -64,6 +68,7 @@ void exibirMenu(int totalItens) {
     printf("Escolha uma opcao: ");
 }
 
+// Adiciona um novo item ao vetor, respeitando o limite máximo da mochila
 void adicionarItem(Item mochila[], int *totalItens) {
     if (*totalItens == TAM_MAX) {
         printf("\nA mochila esta cheia!\n");
@@ -89,24 +94,26 @@ void adicionarItem(Item mochila[], int *totalItens) {
     printf("\nItem adicionado com sucesso!\n");
 }
 
+// Lista todos os itens cadastrados em formato de tabela 
 void listarItens(Item mochila[], int totalItens) {
     if (totalItens == 0) {
-        printf("\nAmochila esta vazia.");
+        printf("\nA mochila esta vazia.");
         return;
     }
 
-    printf("\n===== ITENS NA MOCHIILA =====\n");
+    printf("\n===== ITENS NA MOCHILA =====\n");
     printf("%-20s | %-15s | %s\n", "Nome", "Tipo", "Quantidade");
     printf("--------------------------------------------------\n");
 
     for (int i = 0; i < totalItens; i++) {
-        printf("%-20s | %15s | %d\n",
+        printf("%-20s | %-15s | %d\n",
             mochila[i].nome,
             mochila[i].tipo,
             mochila[i].quantidade);
     }
 }
 
+// Remove um item pelo nome e reorganiza o vetor após a remoção
 void removerItem(Item mochila[], int *totalItens) {
     char nome[TAM_STRING];
     int posicao = -1;
