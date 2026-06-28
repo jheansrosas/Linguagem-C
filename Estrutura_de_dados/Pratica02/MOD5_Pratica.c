@@ -17,17 +17,16 @@ void imprimirResultado(const char* nomeDaBusca, const char* item, int resultado)
 
 int main() {
     const char* listaDeCompras[] = {
-        "arroz"
-        "batata"
-        "cebola"
-        "detergente"
-        "feijão"
-        "leite"
-        "macarrão"
-        "oleo"
-        "sal"
+        "arroz",
+        "batata",
+        "cebola",
+        "detergente",
+        "feijão",
+        "leite",
+        "macarrão",
+        "oleo",
+        "sal",
         "tomate"
-        "pão"
     };
 
     int tamanhoDaLista = sizeof(listaDeCompras) / sizeof(listaDeCompras[0]);
@@ -127,10 +126,10 @@ int buscaBinariaIterativa(const char* lista[], int tamanho, const char* item) {
             fim = meio - 1;
         } else {
             inicio = meio + 1;
-        }
-
-        return -1;
+        }  
     }
+    
+    return -1;
 }
 
 // Função principal da busca binária recursiva
