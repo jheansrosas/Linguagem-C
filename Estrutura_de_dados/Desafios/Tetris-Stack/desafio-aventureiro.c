@@ -76,6 +76,11 @@ int main() {
                 break;
 
             case 2: // Insere uma nova peça no final da fila
+                if (pilhaCheia(&pilha)) {
+                    printf("\nA pilha de reserva esta cheia.\n");
+                    break;
+                }
+
                 Peca reservada;
 
                 remover(&fila, &reservada);
@@ -85,6 +90,11 @@ int main() {
                 break;
                 
             case 3: 
+                if (pilhaVazia(&pilha)) {
+                    printf("\nA pilha de reserva esta vazia.\n");
+                    break;
+                }
+                
                 Peca usada;
                 
                 pop(&pilha, &usada);
