@@ -19,6 +19,7 @@ typedef struct {
     int total;
 } Fila;
 
+// Estrutura que representa a pilha de peças reservadas
 typedef struct {
     Peca itens[MAX_PILHA];
     int topo;
@@ -67,7 +68,7 @@ int main() {
         getchar();
 
         switch (opcao) {
-            case 1: // Remove a primeira peça da fila e gera uma nova automaticamente
+            case 1: {  // Remove a primeira peça da fila e gera uma nova automaticamente
                 Peca jogada;
 
                 remover(&fila, &jogada);
@@ -77,8 +78,9 @@ int main() {
                 inserir(&fila, gerarPeca());
 
                 break;
+            }
 
-            case 2: // Insere uma nova peça no final da fila
+            case 2: {  // Move a peça da frente para a pilha e gera uma nova peça
                 if (pilhaCheia(&pilha)) {
                     printf("\nA pilha de reserva esta cheia.\n");
                     break;
@@ -91,8 +93,9 @@ int main() {
 
                 inserir(&fila, gerarPeca());
                 break;
+            }
                 
-            case 3: 
+            case 3: {
                 if (pilhaVazia(&pilha)) {
                     printf("\nA pilha de reserva esta vazia.\n");
                     break;
@@ -107,14 +110,15 @@ int main() {
                     usada.id);
 
                 break;
+            }
             
             case 4:
-                    trocarPecaAtual(&fila, &pilha);
-                    break;
+                trocarPecaAtual(&fila, &pilha);
+                break;
                   
             case 5:
-                    trocarTresPecas(&fila, &pilha);
-                    break;
+                trocarTresPecas(&fila, &pilha);
+                break;
 
             case 0:
                 printf("\nSaindo do jogo...\n");
@@ -205,18 +209,22 @@ void mostrarFila(Fila *f) {
     printf("\n");
 }
 
+// Inicializa a pilha de reserva vazia
 void inicializarPilha(Pilha*p) {
     p->topo = -1;
 }
 
+// Verifica se a pilha atingiu sua capacidade máxima
 int pilhaCheia(Pilha *p) {
     return p->topo == MAX_PILHA - 1;
 }
 
+// Verifica se a pilha está vazia
 int pilhaVazia(Pilha *p) {
     return p->topo == -1;
 }
 
+// Insere uma peça no topo da pilha de reserva
 void push(Pilha *p, Peca peca) {
     if (pilhaCheia(p)) {
         printf("\nA pilha de reserva esta cheia.\n");
@@ -227,6 +235,7 @@ void push(Pilha *p, Peca peca) {
     p->itens[p->topo] = peca;
 }
 
+// Remove uma peça do topo da pilha reserva
 void pop(Pilha *p, Peca *peca) {
     if (pilhaVazia(p)) {
         printf("\nA pilha de reserva esta vazia.\n");
@@ -237,6 +246,7 @@ void pop(Pilha *p, Peca *peca) {
     p->topo--;
 }
 
+// Exibe as peças reservadas do topo para a base
 void mostrarPilha(Pilha *p) {
     printf("\nPilha de reserva (Topo -> Base): ");
 
@@ -251,6 +261,7 @@ void mostrarPilha(Pilha *p) {
     printf("\n");
 }
 
+// Troca a peça da frente da fila com a peça do topo da pilha
 void trocarPecaAtual(Fila *fila, Pilha *pilha) {
     if (filaVazia(fila)) {
         printf("\nA fila esta vazia.\n");
@@ -270,9 +281,10 @@ void trocarPecaAtual(Fila *fila, Pilha *pilha) {
     printf("\nTroca realizada entre a frente da fila e o topo da pilha.\n");
 }
 
+// Troca as três primeiras peças da fila com as três peças da pilha
 void trocarTresPecas(Fila *fila, Pilha *pilha) {
     if (fila->total < 3){
-        printf("\nA fila precisa ter pelo meenos 3 pecas.\n");
+        printf("\nA fila precisa ter pelo menos 3 pecas.\n");
         return;
     }
 
