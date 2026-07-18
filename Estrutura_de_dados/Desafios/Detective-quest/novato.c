@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
+// Estrutura que representa cada comodo da mansao
 typedef struct Sala {
     char nome[50];
     struct Sala *esquerda;
@@ -13,6 +14,7 @@ Sala *criarSala(const char *nome);
 void explorarSalas(Sala *atual);
 void liberarSalas(Sala *raiz);
 
+// Cria dinamicamente uma nova sala sem caminhos definidos
 Sala *criarSala(const char *nome) {
     Sala *novaSala = (Sala *) malloc(sizeof(Sala));
 
@@ -28,6 +30,7 @@ Sala *criarSala(const char *nome) {
     return novaSala;
 }
 
+// Monta o mapa da mansao e inicia a exploracao
 int main() {
     Sala *hall = criarSala("Hall de Entrada");
 
@@ -38,7 +41,7 @@ int main() {
     hall->esquerda->direita = criarSala("Jardim");
 
     hall->direita->esquerda = criarSala("Quarto");
-    hall->direita->direita = criarSala("Esecritorio");
+    hall->direita->direita = criarSala("Escritorio");
 
     explorarSalas(hall);
 
@@ -47,6 +50,7 @@ int main() {
     return 0;
 }
 
+// Permite ao jogador navegar pela arvore a partir da sala atual
 void explorarSalas(Sala *atual) {
     char opcao;
 
@@ -54,7 +58,6 @@ void explorarSalas(Sala *atual) {
         printf("\nVoce esta em: %s\n", atual->nome);
 
         if (atual->esquerda == NULL && atual->direita == NULL) {
-            printf("\nVoce chegou a: %s\n", atual->nome);
             printf("Este comodo nao possui outras passagens.\n");
             printf("Exploracao concluida!\n");
             break;
@@ -90,7 +93,7 @@ void explorarSalas(Sala *atual) {
     }
 }
 
-// Liberar toda a memória alocada para a árvore
+// Liberar recursivamente toda a memoria alocada para a arvore
 void liberarSalas(Sala *raiz) {
     if (raiz != NULL) {
         liberarSalas(raiz->esquerda);
