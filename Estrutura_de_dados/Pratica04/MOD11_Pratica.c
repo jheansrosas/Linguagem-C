@@ -10,66 +10,66 @@
 // BTS: Árvore Binária de Busca
 // ==========================================================
 
-// Estrutura que representa um nó da BTS
-typedef struct NoBTS {
+// Estrutura que representa um nó da BST
+typedef struct NoBST {
     char valor[50];
-    struct NoBTS *esquerda;
-    struct NoBTS *direita;
-} NoBTS;
+    struct NoBST *esquerda;
+    struct NoBST *direita;
+} NoBST;
 
-// EStrutura que representa um nó da Trie
+// Estrutura que representa um nó da Trie
 typedef struct NoTrie {
     struct NoTrie *filhos[TAMANHO_ALFABETO];
     bool ehFimDePalavra;
 } NoTrie;
 
 // Protótipo das funções da BTS
-NoBTS *criarNoBTS(const char *valor);
-NoBTS *inserirBTS(NoBTS *raiz, const char *valor);
-bool buscarBTS(NoBTS *raiz, const char *chave);
-void emOrdemBTS(NoBTS *raiz);
-void liberarBTS(NoBTS *raiz);
+NoBST *criarNoBST(const char *valor);
+NoBST *inserirBST(NoBST *raiz, const char *valor);
+bool buscarBST(NoBST *raiz, const char *chave);
+void emOrdemBST(NoBST *raiz);
+void liberarBST(NoBST *raiz);
 
 // Protótipo das funções da Trie
 NoTrie *criarNoTrie(void);
 void normalizar(const char *entrada, char *saida);
 void inserirTrie(NoTrie *raiz, const char *palavra);
 bool buscarTrie(NoTrie *raiz, const char *palavra);
-void liberarPalavras(NoTrie *no, char *buffer, int nivel);
+void listarPalavras(NoTrie *no, char *buffer, int nivel);
 void liberarTrie(NoTrie *raiz);
 
 int main() {
     // ===================================================
-    // Demonstração da BTS
+    // Demonstração da BST
     // ===================================================
 
-    printf("\n===== BTS =====\n");
+    printf("\n===== BST =====\n");
 
-    NoBTS *raizBTS = NULL;
+    NoBST *raizBST = NULL;
 
     // Insere as pistas na árvore bináriaa de busca
-    raizBTS = inserirBTS(raizBTS, "Pegadas de Lama");
-    raizBTS = inserirBTS(raizBTS, "Chave perdida");
-    raizBTS = inserirBTS(raizBTS, "Livro com pagina faltando");
-    raizBTS = inserirBTS(raizBTS, "Lencol manchado");
-    raizBTS = inserirBTS(raizBTS, "Gaveta perdida");
+    raizBST = inserirBST(raizBST, "Pegadas de Lama");
+    raizBST = inserirBST(raizBST, "Chave perdida");
+    raizBST = inserirBST(raizBST, "Livro com pagina faltando");
+    raizBST = inserirBST(raizBST, "Lencol manchado");
+    raizBST = inserirBST(raizBST, "Gaveta perdida");
 
     // Exibe os valores em ordem alfabética
-    printf("Em ordem (BTS): ");
-    emOrdemBTS(raizBTS);
+    printf("Em ordem (BST): ");
+    emOrdemBST(raizBST);
     printf("\n");
 
     // Realiza buscas na BTS
     printf(
         "Buscar 'Lencol manchado' (BTS): %s\n",
-        buscarBTS(raizBTS, "Lencol manchado")
+        buscarBST(raizBST, "Lencol manchado")
             ? "Encontrado"
             : "Nao encontrado"
     );
 
     printf(
         "Buscar 'Oculos' (BTS): %s\n",
-        buscarBTS(raizBTS, "Oculos")
+        buscarBST(raizBST, "Oculos")
             ? "Encontrado"
             : "Nao encontrado"
     );
@@ -127,8 +127,215 @@ int main() {
     );
 
     // Libera toda a memória alocada
-    liberarBTS(raizBTS);
+    liberarBST(raizBST);
     liberarTrie(raizTrie);
 
     return 0;
+}
+
+// =======================================================
+// Funções da BST
+// =======================================================
+
+// Cria dinamicamente um novo nó da BST
+NoBST *criarNoBST(const char *valor) {
+    NoBST *novo = malloc(sizeof(NoBST));
+
+    if (novo == NULL) {
+        printf("Erro ao alocar memoria para a BST.\n");
+        exit(1);
+    }
+
+    strcpy(novo->valor, valor);
+
+    novo->esquerda = NULL;
+    novo->direita = NULL;
+
+    return novo;
+}
+
+// Inserir um valor na BST seguindo a ordem alfabética
+NoBST *inserirBST(NoBST *raiz, const char *valor) {
+    // Encontrou uma posição vazia
+    if (raiz == NULL) {
+        return criarNoBST(valor);
+    }
+
+    // Valores menores ficam na subárvore esquerda
+    if (strcmp(valor, raiz->valor) < 0) {
+        raiz->esquerda = inserirBST(raiz->esquerda, valor);
+    } else {
+        // Valores maiores ou iguais ficam na subárvore direita
+        raiz->direita = inserirBST(raiz->direita, valor);
+    }
+
+    return raiz;
+}
+
+// Procura uma chave na BST
+bool buscarBST(NoBST *raiz, const char *chave) {
+    // A chave não foi encontrada
+    if (raiz == NULL) {
+        return false;
+    }
+
+    int comparacao = strcmp(chave, raiz->valor);
+
+    // A chave corresponde ao valor do nó atual
+    if (comparacao == 0) {
+        return true;
+    }
+
+    // Procura na subárvore esquerda
+    if (comparacao < 0) {
+        return buscarBST(raiz->esquerda, chave);
+    }
+
+    // Procura na subárvore direita
+    return buscarBST(raiz->direita, chave);
+}
+
+// Exibe os elementos da BST em ordem alfabética
+void emOrdemBST(NoBST *raiz) {
+    if (raiz != NULL) {
+        emOrdemBST(raiz->esquerda);
+
+        printf("%s, ", raiz->valor);
+
+        emOrdemBST(raiz->direita);
+    }
+}
+
+// Libera recursivamente a memória usada pela BST
+void liberarBST(NoBST *raiz) {
+    if (raiz != NULL) {
+        liberarBST(raiz->esquerda);
+        liberarBST(raiz->direita);
+
+        free(raiz);
+    }
+}
+
+// =======================================================
+// Funções da Trie
+// =======================================================
+
+// Cria dinamicamente um novo nó da Trie
+NoTrie *criarNoTrie(void) {
+    NoTrie *novo = malloc(sizeof(NoTrie));
+
+    if (novo == NULL) {
+        printf("Erro ao alocar memoria para a Trie.\n");
+        exit(1);
+    }
+
+    novo->ehFimDePalavra = false;
+
+    // Todos os filhos começam vazios
+    for (int i = 0; i < TAMANHO_ALFABETO; i++) {
+        novo->filhos[i] = NULL;
+    }
+
+    return novo;
+}
+
+// Converte letras maiúsculas em minúsculas e remove
+// espaços, números, símbolos e outros caracteres
+void normalizar(const char *entrada, char *saida) {
+    int j = 0;
+
+    for (int i = 0; entrada[i] != '\0'; i++) {
+        char caractere = entrada[i];
+
+        // Converte letra maiúscula para minúscula
+        if (caractere >= 'A' && caractere <= 'Z') {
+            caractere += 32;
+        }
+
+        // Copia apenas letras minúsculas sem acento
+        if (caractere >= 'a' && caractere <= 'z') {
+            saida[j] = caractere;
+            j++;
+        }
+    }
+
+    saida[j] = '\0';
+}
+
+// Insere uma palavra previamente normalizada na Trie
+void inserirTrie(NoTrie *raiz, const char *palavra) {
+    NoTrie *atual = raiz;
+
+    for (int i = 0; palavra[i] != '\0'; i++) {
+        int indice = palavra[i] - 'a';
+
+        // Cria o caminho quando o caractere ainda não existe
+        if (atual->filhos[indice] == NULL) {
+            atual->filhos[indice] = criarNoTrie();
+        }
+
+        atual = atual->filhos[indice];
+    }
+
+    // Marca o último nó como fim de uma palavra válida
+    atual->ehFimDePalavra = true;
+}
+
+// Procura uma palavra completa na Trie
+bool buscarTrie(NoTrie *raiz, const char *palavra) {
+    NoTrie *atual = raiz;
+
+    for (int i = 0; palavra[i] != '\0'; i++) {
+        int indice = palavra[i] - 'a';
+
+        // O caminho necessário não existe
+        if (atual->filhos[indice] == NULL) {
+            return false;
+        }
+
+        atual = atual->filhos[indice];
+    }
+
+    // Só retorna verdadeiro quando a palavra termina nesse nó
+    return atual != NULL && atual->ehFimDePalavra;
+}
+
+// Percorre a Trie e exibe as palavras em ordem lexicográfica
+void listarPalavras(NoTrie *no, char *buffer, int nivel) {
+    if (no == NULL) {
+        return;
+    }
+
+    // Encontrou o fim de uma palavra
+    if (no->ehFimDePalavra) {
+        buffer[nivel] = '\0';
+        printf("%s, ", buffer);
+    }
+
+    // Percorre os filhos de 'a' até 'z'
+    for (int i = 0; i < TAMANHO_ALFABETO; i++) {
+        if (no->filhos[i] != NULL) {
+            buffer[nivel] = 'a' + i;
+
+            listarPalavras(
+                no->filhos[i],
+                buffer,
+                nivel + 1
+            );
+        }
+    }
+}
+
+// Libera recursivamente todos os nós da Trie
+void liberarTrie(NoTrie *raiz) {
+    if (raiz == NULL) {
+        return;
+    }
+
+    // Libera primeiro todos os filhos
+    for (int i = 0; i < TAMANHO_ALFABETO; i++) {
+        liberarTrie(raiz->filhos[i]);
+    }
+
+    free(raiz);
 }
