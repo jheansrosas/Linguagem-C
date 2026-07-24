@@ -40,10 +40,13 @@ void emOrdemBST(NoBST *raiz);
 void liberarBST(NoBST *raiz);
 
 int funcaoHash(const char *pista);
-void inicializarHash();
+void inicializarHash(void);
 void inserirNaHash(const char *pista, const char *suspeito);
-void exibirAssociacao();
-void liberarHash();
+void exibirAssociacoes(void);
+void liberarHash(void);
+
+int contarPistasDoSuspeito(const char *suspeito);
+void encontrarMaisCitado(char *resultado);
 
 // Cria dinamicamente uma nova sala sem caminhos definidos
 Sala *criarSala(const char *nome, const char *pista, const char *suspeito) {
@@ -116,7 +119,7 @@ void liberarBST(NoBST *raiz) {
     }
 }
 
-// Calcula o indice sa tabela com base na soma dos caracteres da pista
+// Calcula o indice da tabela com base na soma dos caracteres da pista
 int funcaoHash(const char *pista) {
     int soma = 0;
 
@@ -128,7 +131,7 @@ int funcaoHash(const char *pista) {
 }
 
 // Inicializa todas as posicoes da tabela hash como vazias
-void inicializarHash() {
+void inicializarHash(void) {
     for (int i = 0; i < TAMANHO_HASH; i++) {
         tabelaHash[i] = NULL;
     }
@@ -150,6 +153,86 @@ void inserirNaHash(const char *pista, const char *suspeito) {
 
     nova->proximo = tabelaHash[indice];
     tabelaHash[indice] = nova;
+}
+
+// Exibe todas as associacoes entre pistas e suspeitos
+void exibirAssociacoes(void) {
+    printf("\n===== ASSOCIACOES PISTAS -> SUSPEITO =====\n");
+
+    int encontrou = 0;
+
+    for (int i = 0; i < TAMANHO_HASH; i++) {
+        Associacao *atual = tabelaHash[i];
+
+        while (atual != NULL) {
+            printf("%s -> %s \n",
+                    atual->pista,
+                    atual->suspeito);
+
+            encontrou = 1;
+            atual = atual->proximo;
+        }
+    }
+
+    if (!encontrou) {
+        printf("Nenhuma associacao foi encontrada.\n");
+    }
+}
+
+// Conta quantas pistas estao relacionadas ao suspeito informado
+int contarPistasDoSuspeito(const char *suspeito) {
+    int quantidade = 0;
+
+    for (int i = 0; i < TAMANHO_HASH; i++) {
+        Associacao *atual = tabelaHash[i];
+
+        while (atual != NULL) {
+            if (strcmp(atual->suspeito, suspeito) == 0) {
+                quantidade++;
+            }
+
+            atual = atual->proximo;
+        }
+    }
+
+    return quantidade;
+}
+
+// Encontra o suspeito com maior quantidade de pistas associadas
+void encontrarMaisCitado(char *resultado) {
+    int maiorQuantidade = 0;
+    resultado[0] = '\0';
+
+    for (int i = 0; i < TAMANHO_HASH; i++) {
+        Associacao *atual = tabelaHash[i];
+
+        while (atual != NULL) {
+            int quantidade = contarPistasDoSuspeito(atual->suspeito);
+
+            if (quantidade > maiorQuantidade) {
+                maiorQuantidade = quantidade;
+                strcpy(resultado, atual->suspeito);
+            }
+
+            atual = atual->proximo;
+        }
+    }
+}
+
+// Libera toda a memoria utilizada pela tabela hash
+void liberarHash(void) {
+    for (int i = 0; i < TAMANHO_HASH; i++) {
+        Associacao *atual = tabelaHash[i];
+
+        while (atual != NULL) {
+            Associacao *temporaria = atual;
+            atual = atual->proximo;
+
+            free(temporaria);
+        }
+
+        tabelaHash[i] = NULL;
+    }
 }
 
 // Monta o mapa da mansao e inicia a exploracao
@@ -178,8 +261,37 @@ int main() {
         emOrdemBST(raizPistas);
     }
 
+    exibirAssociacoes();
+
+    char maisCitado[50];
+
+    encontrarMaisCitado(maisCitado);
+
+    if (strlen(maisCitado) > 0) {
+        printf("\nSuspeito mais citado: %s\n", maisCitado);
+    } else {
+        printf("\nNenhum suspeito foi relacionado as pistas.\n");
+    }
+
+    char acusacao[50];
+
+    printf("\nDigite o nome do suspeito que deseja acusar: ");
+    scanf(" %49[^\n]", acusacao);
+
+    int quantidadePistas = contarPistasDoSuspeito(acusacao);
+
+    if (quantidadePistas >= 2) {
+        printf("\nAcusacao aceita!\n");
+        printf("%s possui %d pistas relacionadas.\n",
+                acusacao,
+                quantidadePistas);
+    } else {
+        printf("\nEvidencias insuficientes contra %s.\n", acusacao);
+    }
+
     liberarSalas(hall);
     liberarBST(raizPistas);
+    liberarHash();
 
     return 0;
 }
